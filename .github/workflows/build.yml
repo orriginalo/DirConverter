@@ -40,23 +40,3 @@ jobs:
         run: |
           pip install pyinstaller
           pyinstaller --onefile --name "DirConverter" DirConverter.py
-
-  build-archlinux:
-    runs-on: ubuntu-latest  # Using Ubuntu runner for Arch Linux build
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Arch Linux environment
-        run: |
-          sudo pacman -Syu --noconfirm base-devel git 
-          git clone https://aur.archlinux.org/yay.git
-          cd yay && makepkg -si --noconfirm && cd .. && rm -rf yay  # Install yay AUR helper
-
-      - name: Install Python and dependencies for Arch Linux
-        run: |
-          yay -S --noconfirm python-pip python-pyinstaller  # Install Python and PyInstaller from AUR
-
-      - name: Build with PyInstaller on Arch Linux
-        run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt  # Install project dependencies if needed
-          pyinstaller --onefile --name "DirConverter" DirConverter.py
