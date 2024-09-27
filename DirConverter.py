@@ -20,6 +20,8 @@ pictures_convertto = ".avif"  # Photo convert to
 pictures_quality = 30  # Quality level for photos
 
 
+
+total_elapsed_time = []
 def shorten_string(original_string, max_length=20, extention:str = ''):
 		if len(original_string) > max_length:
 				return original_string[:max_length - 3] + '.. ' + extention
@@ -31,7 +33,7 @@ def convert_audio(path):
 		if extention != audio_convertto and extention in audio_ext and not os.path.isdir(file):
 			audio_file_path = os.path.join(f"{path}", file)
 			converted_file_path = os.path.join(f"{path}", f"{name}{audio_convertto}")
-			print(f"AUDIO: [bold yellow]Converting: {shorten_string(file,20,extention)} [bold white]>>>[bold yellow] {shorten_string(name, 20)}{audio_convertto}", end='')
+			print(f"AUDIO: [bold yellow]Converting: {shorten_string(file,20,extention)} [bold white]>>>[bold dark_orange] {shorten_string(name, 20)}{audio_convertto}", end='')
 			
 			# Конвертация файла в MP3
 			start = perf_counter()
@@ -43,7 +45,8 @@ def convert_audio(path):
 			end = perf_counter()
 			
 			elapsed_time = end - start
-			print(f" [bold green] Succerfully! [/bold green]{elapsed_time:.1f} sec")
+			total_elapsed_time.append(elapsed_time)
+			print(f" [bold green] Successfully! [/bold green]{elapsed_time:.1f} sec")
 	print("\n")
 def convert_photo(path):
 	for file in os.listdir(path):
@@ -63,7 +66,7 @@ def convert_photo(path):
 			]
 			
 	 
-			print(f"IMAGE: [bold yellow]Converting: {shorten_string(file,20,extention)} [bold white]>>>[bold yellow] {shorten_string(name, 20)}{pictures_convertto}", end='')
+			print(f"IMAGE: [bold yellow]Converting: {shorten_string(file,20,extention)} [bold white]>>>[bold dark_orange] {shorten_string(name, 20)}{pictures_convertto}", end='')
 			try:
 					# Запускаем команду
 					start = perf_counter()
@@ -72,11 +75,23 @@ def convert_photo(path):
 					end = perf_counter()
 			
 					elapsed_time = end - start
+					total_elapsed_time.append(elapsed_time)
 					print(f" [bold green] Successfully! [/bold green]{elapsed_time:.1f} sec")
 			except subprocess.CalledProcessError as e:
 					print(f" [bold red]ERROR")
 	print("\n")
 
+def ask(text):
+	answer = str(Console().input(f"{text} [green]y[/green]/[red]n[/red]: "))
+	if answer.lower() in ["y", "yes", "\n"]:
+		return True
+	return False
+
+def has_dirs(path):
+	for el in os.listdir(path):
+		if os.path.isdir(os.path.join(path, el)):
+			return True
+	
 
 def main():
 	print("========[bold green]SUPER-CONVERTER[/bold green]========")
@@ -92,14 +107,25 @@ def main():
 	print(f"2. Images to [bold]{pictures_convertto}")
 	variant = list(dict.fromkeys([int(x) for x in input("Enter your choice: ").split() if int(x) <= 2]))
 	
-	for i in variant:
-		match i:
-			case 1:
-				convert_audio(path)
-			case 2:
-				convert_photo(path)
+	if has_dirs(path):
+		if ask("[bold]Go through all the directories in this folder?"):
+			for root, dirs, files in os.walk(path):
+				for dir in dirs:
+					for i in variant:
+						match i:
+							case 1:
+								convert_audio(os.path.join(root, dir))
+							case 2:
+								convert_photo(os.path.join(root, dir))
+	else:
+		for i in variant:
+			match i:
+				case 1:
+					convert_audio(path)
+				case 2:
+					convert_photo(path)
 				
-	print("[bold green]Files converted successfully!")
+	print(f"[bold green]Files converted successfully! [/bold green][bold]Total elapsed time: [bold blue]{sum(total_elapsed_time):.1f} sec")
 	
 if __name__ == "__main__":
 	main()
