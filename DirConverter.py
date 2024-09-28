@@ -1,12 +1,11 @@
 import os
 import subprocess
-from PIL import Image
 from rich import print
 from rich.console import Console
 from pydub import AudioSegment
 from time import perf_counter
-
-# pip install rich pydub pillow
+from wand.image import Image
+# pip install rich pydub Wand
 
 console = Console()
 
@@ -55,22 +54,15 @@ def convert_photo(path):
 			input_path = os.path.join(path, file)
 			output_path = os.path.join(path, f"{name}{pictures_convertto}")
 			
-			# Формируем команду для конвертации с помощью FFmpeg
-			command = [
-					'ffmpeg',
-					'-i', input_path,
-					'-c:v', 'libaom-av1',
-					'-crf', str(pictures_quality),  # Уровень качества (можно настроить)
-					'-pix_fmt', 'yuv420p',
-					output_path
-			]
-			
-	 
 			print(f"IMAGE: [bold yellow]Converting: {shorten_string(file,20,extention)} [bold white]>>>[bold dark_orange] {shorten_string(name, 20)}{pictures_convertto}", end='')
 			try:
 					# Запускаем команду
 					start = perf_counter()
-					cmd = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+     
+					with Image(filename=input_path) as original:
+						with original.convert(pictures_convertto.replace(".", "")) as converted:
+							converted.save(filename=output_path)  # Сохраните 
+
 					os.remove(input_path)
 					end = perf_counter()
 			

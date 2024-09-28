@@ -1,9 +1,16 @@
+altgraph==0.17.4
 ffmpeg==1.4
 markdown-it-py==3.0.0
 mdurl==0.1.2
+packaging==24.1
+pefile==2024.8.26
 pillow==10.4.0
 pydub==0.25.1
 Pygments==2.18.0
+pyinstaller==6.10.0
+pyinstaller-hooks-contrib==2024.8
+pywin32-ctypes==0.2.3
 rich==13.8.1
 setuptools==75.1.0
+Wand==0.6.13
 wheel==0.44.0
